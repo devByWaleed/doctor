@@ -1,0 +1,135 @@
+Engineered a full-stack, responsive music streaming application using PHP and MySQL. Implemented a scalable and designed a user-centric frontend to provide an intuitive, responsive listening experience across devices.
+
+
+-------------------------------
+localhost:27017
+connect ECONNREFUSED 127.0.0.1:27017, connect ECONNREFUSED ::1:27017
+
+Solution:-
+1. Win+R -> services.music
+2. Make sure MongoDB Server (MongoDB) is running
+-------------------------------
+Cloudinary Error: Must supply api_key
+
+Solution: make sure you write this in server.js
+await connectCloudinary()
+-------------------------------
+
+
+
+
+
+--------------------------------------------------------------------
+# MERN Stack Doctor Appointment Booking System - Time-Based Division
+
+## Day 1: (Hours 6:04 - 8:54)
+**Total Time: 2 hours 50 minutes**
+
+### Part 1: Project Setup & Admin Authentication (6:04 - 7:02)
+- 6:04 - 6:25: Setting up admin panel for doctor appointment booking system
+- 6:25 - 6:45: Setting up and running the project on specific ports
+- 6:45 - 7:02: Setting up admin assets and context for the project
+
+### Part 2: Context & State Management (7:02 - 7:54)
+- 7:02 - 7:20: Creating context providers for different roles
+- 7:20 - 7:45: Creating and managing state variables for admin and doctor login
+- 7:45 - 7:54: Adding email and password input fields with required attribute
+
+### Part 3: Admin Login Implementation (7:54 - 8:54)
+- 7:54 - 8:20: Implementing user login functionality and changing states
+- 8:20 - 8:35: Setting up admin login logic and UI design
+- 8:35 - 8:54: Creating form submission function and making API calls
+
+---
+
+## Day 2: (Hours 8:54 - 11:13)
+**Total Time: 2 hours 19 minutes**
+
+### Part 1: Token Management & Dashboard (8:54 - 9:54)
+- 8:54 - 9:15: Fetching token from backend and saving it
+- 9:15 - 9:35: Manage admin access with token storage
+- 9:35 - 9:54: Creating dashboard UI design for the admin
+
+### Part 2: Sidebar & Navigation (9:54 - 10:40)
+- 9:54 - 10:15: Adding CSS properties for admin text, logo, and logout button
+- 10:15 - 10:30: Implementing login and logout functionality
+- 10:30 - 10:40: Setting up admin dashboard routes and sidebar navigation
+
+### Part 3: Add Doctor Page Design (10:40 - 11:13)
+- 10:40 - 11:00: Adding menu items to sidebar with icons and text
+- 11:00 - 11:13: Creating dynamic class names for active navigation links
+
+---
+
+## Day 3: (Hours 11:13 - 14:06)
+**Total Time: 2 hours 53 minutes**
+
+### Part 1: Add Doctor Form (11:13 - 12:15)
+- 11:13 - 11:30: Designing the add doctor page
+- 11:30 - 11:50: Create select tag with options for experience and fee input field
+- 11:50 - 12:15: Creating input fields and sections for doctor appointment booking system
+
+### Part 2: Styling & State Management (12:15 - 13:10)
+- 12:15 - 12:35: Adding CSS properties to various elements
+- 12:35 - 12:55: Styling input fields using CSS properties
+- 12:55 - 13:10: Setting state variables and linking to input fields
+
+### Part 3: Image Upload & API Integration (13:10 - 14:06)
+- 13:10 - 13:30: Displaying selected image using MERN stack
+- 13:30 - 13:50: Link form submission with API call
+- 13:50 - 14:06: Import and use react-toastify package
+
+---
+
+## Day 4: (Hours 14:06 - 17:02)
+**Total Time: 2 hours 56 minutes**
+
+### Part 1: Doctor Management APIs (14:06 - 15:00)
+- 14:06 - 14:30: Logging values using template literals
+- 14:30 - 14:50: Adding Admin Token for Authentication
+- 14:50 - 15:00: Resetting input fields after submission
+
+### Part 2: Database Operations (15:00 - 16:00)
+- 15:00 - 15:30: Adding doctors to the database
+- 15:30 - 15:50: Creating API to get all doctors data
+- 15:50 - 16:00: Saving doctor request and retrieving details
+
+### Part 3: Doctors Listing UI (16:00 - 17:02)
+- 16:00 - 16:30: Calling the API to get all doctors data
+- 16:30 - 16:45: Creating doctor appointment booking system UI
+- 16:45 - 17:02: Adding CSS styles to doctor listing
+
+---
+
+## Day 5: (Hours 17:02 - 19:51)
+**Total Time: 2 hours 49 minutes**
+
+### Part 1: Availability Toggle (17:02 - 18:00)
+- 17:02 - 17:25: Implement functionality to change doctor's availability
+- 17:25 - 17:45: Updating doctor's availability status
+- 17:45 - 18:00: Creating route for availability updates
+
+### Part 2: Frontend Integration (18:00 - 19:00)
+- 18:00 - 18:25: Implementing update functionality
+- 18:25 - 18:45: Setting up environment variables in frontend
+- 18:45 - 19:00: Setting up react toastify for notifications
+
+### Part 3: User Authentication Setup (19:00 - 19:51)
+- 19:00 - 19:25: Create function to get all doctors list for frontend
+- 19:25 - 19:40: Creating API logic for user authentication
+- 19:40 - 19:51: Implementing validation for user fields
+
+---
+
+## Summary Table
+
+| Day | Time Range | Duration | Main Topics |
+|-----|------------|----------|-------------|
+| Day 1 | 6:04 - 8:54 | 2h 50m | Project Setup, Admin Auth, Context |
+| Day 2 | 8:54 - 11:13 | 2h 19m | Token Management, Dashboard, Sidebar |
+| Day 3 | 11:13 - 14:06 | 2h 53m | Add Doctor Form, Styling, Image Upload |
+| Day 4 | 14:06 - 17:02 | 2h 56m | Doctor APIs, Database, Listing UI |
+| Day 5 | 17:02 - 19:51 | 2h 49m | Availability Toggle, User Auth |
+
+**Total Development Time: ~13 hours 47 minutes**
+--------------------------------------------------------------------
