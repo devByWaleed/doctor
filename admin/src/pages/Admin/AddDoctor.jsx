@@ -51,9 +51,7 @@ const AddDoctor = () => {
                 console.log(`${key} : ${value}`);
             });
 
-            const res = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/admin/add-doctor', formData, { headers: { adminToken } })
-
-            const data = res.json()
+            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/admin/add-doctor', formData, { headers: { adminToken } })
 
             if (data.success) {
                 toast.success(data.message)

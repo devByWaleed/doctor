@@ -57,8 +57,8 @@ export const addDoctor = async (req, res) => {
             image: imageURL
         }
 
-        // const newDoctor = new DoctorModel(doctorData)
-        // await newDoctor.save()
+        const newDoctor = new DoctorModel(doctorData)
+        await newDoctor.save()
 
         return res.json({
             success: true,
@@ -115,6 +115,26 @@ export const loginAdmin = async (req, res) => {
         })
     }
 }
+
+
+// All Doctors List : /api/admin/all-doctors
+export const allDoctors = async (req, res) => {
+    try {
+        const doctors = await DoctorModel.find({}).select("-password")
+        return res.json({
+            success: true,
+            message: doctors
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 
 /*
 http://localhost:4000/api/admin/add-doctor

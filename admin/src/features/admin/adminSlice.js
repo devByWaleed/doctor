@@ -4,6 +4,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
     Admin: null,
     adminToken: localStorage.getItem('adminToken') || "",
+    doctors: [],
     error: null,
     loading: false
 }
@@ -30,10 +31,13 @@ export const adminSlice = createSlice({
         setAdminToken: (state, action) => {
             state.adminToken = action.payload
         },
+        setDoctors: (state, action) => {
+            state.doctors = action.payload
+        },
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { signInStart, signInSuccess, signInFailure, setAdminToken } = adminSlice.actions
+export const { signInStart, signInSuccess, signInFailure, setAdminToken, setDoctors } = adminSlice.actions
 
 export default adminSlice.reducer
