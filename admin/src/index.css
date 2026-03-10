@@ -4,3 +4,7 @@
   --color-primary: #5f6FFF;
   --color-primary-dull: #44ae7c;
 }
+
+::-webkit-scrollbar {
+  @apply hidden;
+}
