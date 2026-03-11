@@ -34,7 +34,7 @@ const DoctorsList = () => {
 
     const changeAvailability = async (docID) => {
         try {
-            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/admin/change-availability", {docID}, { headers: { adminToken } })
+            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/admin/change-availability", { docID }, { headers: { adminToken } })
 
             if (data.success === false) {
                 toast.error(data.message)
@@ -72,9 +72,9 @@ const DoctorsList = () => {
 
                                 <div className='mt-2 flex items-center gap-1 text-sm'>
                                     <input
-                                    onChange={() => changeAvailability(item._id)}
-                                    type="checkbox" checked={item.available} />
-                                    <p>Available</p>
+                                        onChange={() => changeAvailability(item._id)}
+                                        type="checkbox" checked={item.available} />
+                                    <p>{item.available ? "Available" : "Not Available"}</p>
                                 </div>
                             </div>
                         </div>

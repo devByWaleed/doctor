@@ -6,12 +6,8 @@ export const changeAvailability = async (req, res) => {
         const { docID } = req.body
 
         const docData = await DoctorModel.findById(docID)
-        console.log(docData);
 
-        console.log(docData.available);
-        console.log(!docData.available);
-
-        // await DoctorModel.findByIdAndUpdate(docID, { available: !docData.available })
+        await DoctorModel.findByIdAndUpdate(docID, { available: !docData.available })
         return res.json({
             success: true,
             message: "Availability changed"
@@ -32,7 +28,7 @@ export const changeAvailability = async (req, res) => {
 export const doctorList = async (req, res) => {
     try {
         const doctors = await DoctorModel.find({}).select(["-email", "-password"])
-        
+
         return res.json({
             success: true,
             message: doctors

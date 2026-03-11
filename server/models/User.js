@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { profile } from "../profile"
+import profile from "../profile.js"
 
 
 // Creating doctor schema

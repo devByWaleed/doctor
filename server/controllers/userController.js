@@ -15,7 +15,7 @@ export const register = async (req, res) => {
                 message: "Missing Details"
             })
         }
-        
+
         // Not valid email
         if (!validator.isEmail(email)) {
             return res.json({
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
                 message: "Enter a valid email!"
             })
         }
-        
+
         // Not valid password
         if (password.length < 8) {
             return res.json({
@@ -42,27 +42,27 @@ export const register = async (req, res) => {
         }
 
         // Hashing the password
-         const salt = await bcrypt.genSalt(10)
+        const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        // const user = new UserModel({ name, email, password: hashedPassword })
-        // await user.save();
+        const user = new UserModel({ name, email, password: hashedPassword })
+        await user.save();
 
         // Creating token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+        const userToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
 
-        res.json({ 
+        res.json({
             success: true,
             user: { email: user.email, name: user.name },
-            token
+            userToken: userToken
         })
     }
 
     catch (error) {
         console.log(error.message);
-        res.json({ 
+        res.json({
             success: false,
-            message: error.message 
+            message: error.message
         })
     }
 }
@@ -99,20 +99,20 @@ export const login = async (req, res) => {
             })
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+        const userToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
 
-        res.json({ 
-            success: true, 
-            user: { email: user.email, name: user.name } ,
-            token
+        res.json({
+            success: true,
+            user: { email: user.email, name: user.name },
+            userToken: userToken
         })
     }
 
     catch (error) {
         console.log(error.message);
-        return res.json({ 
-            success: false, 
-            message: error.message 
+        return res.json({
+            success: false,
+            message: error.message
         })
     }
 }
