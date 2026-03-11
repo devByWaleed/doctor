@@ -31,6 +31,25 @@ const DoctorsList = () => {
         }
     }
 
+
+    const changeAvailability = async (docID) => {
+        try {
+            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/admin/change-availability", {docID}, { headers: { adminToken } })
+
+            if (data.success === false) {
+                toast.error(data.message)
+                return
+
+            }
+            toast.success(data.message)
+            getAllDoctors()
+
+
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
     useEffect(() => {
         if (adminToken) {
             getAllDoctors()
@@ -52,7 +71,9 @@ const DoctorsList = () => {
                                 <p className='text-zinc-600 text-sm'>{item.speciality}</p>
 
                                 <div className='mt-2 flex items-center gap-1 text-sm'>
-                                    <input type="checkbox" checked={item.available} />
+                                    <input
+                                    onChange={() => changeAvailability(item._id)}
+                                    type="checkbox" checked={item.available} />
                                     <p>Available</p>
                                 </div>
                             </div>
