@@ -2,6 +2,7 @@ import UserModel from "../models/User.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import validator from "validator"
+import { v2 as cloudinary } from "cloudinary"
 
 // User registration : /api/user/register
 export const register = async (req, res) => {
@@ -109,6 +110,67 @@ export const login = async (req, res) => {
     }
 
     catch (error) {
+        console.log(error.message);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+// Get User Profile : /api/user/profile
+export const getProfile = async (req, res) => {
+    try {
+        const userID = req.userID;
+        const userData = await UserModel.findById(userID).select("-password")
+        res.json({
+            success: true,
+            userData,
+            // userToken: userToken
+        })
+    }
+
+    catch (error) {
+        console.log(error.message);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+
+// Update User Profile : /api/user/profile
+export const updateProfile = async (req, res) => {
+    try {
+        const userID = req.userID;
+        const { name, phone, dob, gender, address } = req.body;
+        const imageFile = req.file
+
+        if (!name || !phone || !dob || !gender) {
+            return res.json({
+                success: false,
+                message: "Data Missing"
+            })
+        }
+
+        await UserModel.findByIdAndUpdate(userID, { name, phone, address: JSON.parse(address), dob, gender })
+
+        if (imageFile) {
+            // Upload image to cloudinary
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" })
+            const imageURL = imageUpload.secure_url
+
+            await UserModel.findByIdAndUpdate(userID, { image: imageURL })
+        }
+        return res.json({
+            success: true,
+            message: "Profile Updated"
+        })
+
+    } catch (error) {
         console.log(error.message);
         return res.json({
             success: false,
