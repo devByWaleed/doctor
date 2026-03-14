@@ -3,6 +3,9 @@ import { assets } from '../assets/assets'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux';
+import {
+    setGlobalData
+} from '../redux/userSlice'
 
 const MyProfile = () => {
     const { userToken } = useSelector((state) => state.user);
@@ -23,6 +26,7 @@ const MyProfile = () => {
 
             }
             setUserData(data.userData)
+            dispatch(setGlobalData(data.userData))
 
             toast.success(data.message)
 
@@ -65,6 +69,7 @@ const MyProfile = () => {
             getUserProfile()
         } else {
             setUserData(false)
+            dispatch(setGlobalData(null))
         }
     }, [userToken])
 

@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
     User: null,
     userToken: localStorage.getItem('userToken') || "",
-    // doctors: [],
+    userGlobalData: null,
     error: null,
     loading: false
 }
@@ -30,11 +30,14 @@ export const userSlice = createSlice({
         // This is how you "set" the token globally
         setUserToken: (state, action) => {
             state.userToken = action.payload
+        },
+        setGlobalData: (state, action) => {
+            state.userGlobalData = action.payload
         }
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { signInStart, signInSuccess, signInFailure, setUserToken } = userSlice.actions
+export const { signInStart, signInSuccess, signInFailure, setUserToken, setGlobalData } = userSlice.actions
 
 export default userSlice.reducer
