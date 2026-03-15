@@ -36,11 +36,11 @@ const Login = () => {
                     return
 
                 }
-                dispatch(signInSuccess(data));
-                dispatch(setUserToken(data.userToken));
-                dispatch(fetchUserProfile(loginResponse.token));
+
+                dispatch(signInStart())
+                dispatch(signInSuccess(data))
+                dispatch(fetchUserProfile(userToken)) // Fetch profile after login
                 localStorage.setItem('userToken', data.userToken)
-                // console.log(data.userToken);
                 toast.success(data.message)
 
             } else {
@@ -52,10 +52,11 @@ const Login = () => {
                     return
 
                 }
-                dispatch(signInSuccess(data));
-                dispatch(setUserToken(data.userToken));
+
+                dispatch(signInStart())
+                dispatch(signInSuccess(data))
+                dispatch(fetchUserProfile(userToken)) // Fetch profile after login
                 localStorage.setItem('userToken', data.userToken)
-                console.log(data.userToken);
                 toast.success(data.message)
             }
         } catch (error) {
@@ -64,11 +65,22 @@ const Login = () => {
 
     }
 
+    // FIXED: Only navigate if we have userData (profile loaded)
     useEffect(() => {
-        if (userToken) {
+        if (userToken && userData) {
             navigate("/")
         }
-    }, [userToken])
+    }, [userToken, userData, navigate])
+
+    // Don't render form if already authenticated
+    if (userToken && userData) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center">
+                <div>Redirecting...</div>
+            </div>
+        )
+    }
+
 
 
     return (

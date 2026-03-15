@@ -5,12 +5,12 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import Doctors from './pages/Doctors'
 import Login from './pages/Login'
-// import MyProfile from './pages/MyProfile'
+import MyProfile from './pages/MyProfile'
 import MyAppointments from './pages/MyAppointments'
 import Appointment from './pages/Appointment'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import MyProfile from './pages/MyProfile copy'
+
 const App = () => {
     return (
         <div className='mx-4 sm:mx-[10%]'>

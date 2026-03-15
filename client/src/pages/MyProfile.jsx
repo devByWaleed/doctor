@@ -1,77 +1,77 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { assets } from '../assets/assets'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    setGlobalData
-} from '../redux/userSlice'
+import { fetchUserProfile, setUserData } from '../redux/userSlice'
 
 const MyProfile = () => {
-    const { userToken } = useSelector((state) => state.user);
+    const { userToken, userData, loading } = useSelector((state) => state.user);
     const dispatch = useDispatch();
 
     const [isEdit, setIsEdit] = useState(false)
-    const [image, setImage] = useState(false)
-    const [userData, setUserData] = useState(false)
+    const [image, setImage] = useState(null)
+    const [localUserData, setLocalUserData] = useState(null)
 
-
-    const getUserProfile = async () => {
-        try {
-            const { data } = await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/user/get-profile", { headers: { userToken } })
-
-            if (data.success === false) {
-                toast.error(data.message)
-                return
-
-            }
-            setUserData(data.userData)
-            dispatch(setGlobalData(data.userData))
-
-            toast.success(data.message)
-
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
-
-    const updateUserProfile = async () => {
-        try {
-            const formData = new FormData()
-
-            formData.append("name", userData.name)
-            formData.append("phone", userData.phone)
-            formData.append("address", JSON.stringify(userData.address))
-            formData.append("gender", userData.gender)
-            formData.append("dob", userData.dob)
-
-            image && formData.append("image", image)
-
-            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/update-profile", formData, { headers: { userToken } })
-
-            if (data.success === false) {
-                toast.error(data.message)
-                return
-            }
-
-            toast.success(data.message)
-            await getUserProfile()
-            setIsEdit(false)
-            setImage(false)
-
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
-
+    // Sync local state when userData changes (only when editing)
     useEffect(() => {
-        if (userToken) {
-            getUserProfile()
-        } else {
-            setUserData(false)
-            dispatch(setGlobalData(null))
+        if (userData && isEdit) {
+            setLocalUserData(userData);
         }
-    }, [userToken])
+    }, [userData, isEdit]);
+
+    // Fetch profile on mount if token exists
+    useEffect(() => {
+        if (userToken && !userData) {
+            dispatch(fetchUserProfile(userToken));
+        }
+    }, [userToken, userData, dispatch]);
+
+    const updateUserProfile = useCallback(async () => {
+        if (!localUserData) return;
+
+        try {
+            const formData = new FormData();
+            formData.append("name", localUserData.name);
+            formData.append("phone", localUserData.phone);
+            formData.append("address", JSON.stringify(localUserData.address));
+            formData.append("gender", localUserData.gender);
+            formData.append("dob", localUserData.dob);
+            if (image) formData.append("image", image);
+
+            const { data } = await axios.post(
+                import.meta.env.VITE_BACKEND_URL + "/api/user/update-profile",
+                formData,
+                { headers: { userToken } }
+            );
+
+            if (!data.success) {
+                toast.error(data.message);
+                return;
+            }
+
+            toast.success(data.message);
+
+            // Refresh profile data from server
+            await dispatch(fetchUserProfile(userToken));
+
+            setIsEdit(false);
+            setImage(null);
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        }
+    }, [localUserData, image, userToken, dispatch]);
+
+    const handleEditClick = () => {
+        if (userData) {
+            setLocalUserData(userData);
+            setIsEdit(true);
+        }
+    };
+
+    if (loading || !userData) {
+        return <div className='max-w-lg p-8'>Loading profile...</div>;
+    }
 
 
     return userData && (
@@ -81,7 +81,7 @@ const MyProfile = () => {
                 isEdit ?
                     <label htmlFor="image">
                         <div className='inline-block relative cursor-pointer'>
-                            <img className='w-36 rounded opacity-75' src={image ? URL.createObjectURL(image) : userData.image} alt="" />
+                            <img className='w-36 rounded opacity-75' src={image ? URL.createObjectURL(image) : userData.image} alt="Profile" />
                             <img className='w-10 absolute bottom-12 right-12' src={image ? "" : assets.upload_icon} alt="" />
                         </div>
                         <input onChange={(e) => setImage(e.target.files[0])} type="file" id="image" hidden />
@@ -93,7 +93,8 @@ const MyProfile = () => {
 
             {
                 isEdit
-                    ? <input className='bg-gray-50 text-3xl font-medium max-w-60' type="text" value={userData.name} onChange={(e) => setUserData(prev => ({ ...prev, name: e.target.value }))} />
+                    ? <input className='bg-gray-50 text-3xl font-medium max-w-60' type="text" value={localUserData?.name || ''}
+                        onChange={(e) => setLocalUserData(prev => ({ ...prev, name: e.target.value }))} />
                     : <p className='font-medium text-3xl text-[#262626] mt-4'>{userData.name}</p>
             }
 
@@ -107,7 +108,8 @@ const MyProfile = () => {
                     <p className='font-medium'>Phone:</p>
                     {
                         isEdit
-                            ? <input className='bg-gray-50 max-w-52' type="phone" value={userData.phone} onChange={(e) => setUserData(prev => ({ ...prev, phone: e.target.value }))} />
+                            ? <input className='bg-gray-50 max-w-52' type="phone" value={localUserData?.phone}
+                                onChange={(e) => setLocalUserData(prev => ({ ...prev, phone: e.target.value }))} />
                             : <p className='text-blue-500'>{userData.phone}</p>
                     }
                     <p className='font-medium'>Address:</p>
@@ -116,9 +118,11 @@ const MyProfile = () => {
                             ?
                             <p>
 
-                                <input className='bg-gray-50' type="text" value={userData.address.line1} onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))} />
+                                <input className='bg-gray-50' type="text" value={localUserData?.address.line1}
+                                    onChange={(e) => setLocalUserData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))} />
                                 <br />
-                                <input className='bg-gray-50' type="text" value={userData.address.line2} onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))} />
+                                <input className='bg-gray-50' type="text" value={localUserData?.address.line2}
+                                    onChange={(e) => setLocalUserData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))} />
 
                             </p>
                             : <p>
@@ -136,7 +140,9 @@ const MyProfile = () => {
                     <p className='font-medium'>Gender:</p>
                     {
                         isEdit
-                            ? <select className='max-w-20 bg-gray-50' onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))} value={userData.gender}>
+                            ? <select className='max-w-20 bg-gray-50'
+                                onChange={(e) => setLocalUserData(prev => ({ ...prev, gender: e.target.value }))}
+                                value={localUserData?.gender}>
                                 <option value="Not Selected">Not Selected</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -146,7 +152,8 @@ const MyProfile = () => {
                     <p className='font-medium'>Birthday:</p>
                     {
                         isEdit
-                            ? <input className='max-w-28 bg-gray-50' type="date" value={userData.dob} onChange={(e) => setUserData(prev => ({ ...prev, dob: e.target.value }))} />
+                            ? <input className='max-w-28 bg-gray-50' type="date" value={localUserData?.dob}
+                                onChange={(e) => setLocalUserData(prev => ({ ...prev, dob: e.target.value }))} />
                             : <p className='text-gray-500'>{userData.dob}</p>
                     }
                 </div>
@@ -156,7 +163,7 @@ const MyProfile = () => {
                 {
                     isEdit
                         ? <button className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all' onClick={updateUserProfile}>Save Information</button>
-                        : <button className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all' onClick={() => setIsEdit(true)}>Edit</button>
+                        : <button className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all' onClick={handleEditClick}>Edit</button>
                 }
             </div>
         </div>
@@ -164,4 +171,3 @@ const MyProfile = () => {
 }
 
 export default MyProfile
-// WAR12345

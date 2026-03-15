@@ -15,7 +15,7 @@ export const initialState = {
 
 export const fetchUserProfile = createAsyncThunk(
     "user/fetchUserProfile",
-    async (userToken, { dispatch, rejectWithValue }) => {
+    async (userToken, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(
                 import.meta.env.VITE_BACKEND_URL + "/api/user/get-profile",
@@ -59,15 +59,25 @@ export const userSlice = createSlice({
             state.userToken = action.payload
         },
         setUserData: (state, action) => {
-            state.userData = { ...initialState.userData, ...action.payload }
-            // state.userData = action.payload
+            // state.userData = { ...initialState.userData, ...action.payload }
+            state.userData = action.payload
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(fetchUserProfile.fulfilled, (state, action) => {
-            state.userData = { ...state.userData, ...action.payload };
-        });
-    },
+        builder
+            .addCase(fetchUserProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchUserProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.userData = action.payload; // Fixed: Direct assignment
+            })
+            .addCase(fetchUserProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+    }
 })
 
 // Action creators are generated for each case reducer function
