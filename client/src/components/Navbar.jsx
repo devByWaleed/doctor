@@ -11,7 +11,7 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const [showMenu, setShowMenu] = useState(false)
-    const { userToken } = useSelector((state) => state.user);
+    const { userToken, userData } = useSelector((state) => state.user);
     const dispatch = useDispatch();
 
     const logout = () => {
@@ -49,7 +49,7 @@ const Navbar = () => {
                 {
                     userToken ?
                         <div className='flex items-center gap-2 cursor-pointer group relative'>
-                            <img className='w-8 rounded-full' src={assets.profile_pic} alt="Pic" />
+                            <img className='w-8 rounded-full' src={userData.image ? userData.image : assets.upload_icon} alt="Pic" />
                             <img className='w-2.5 cursor-pointer' src={assets.dropdown_icon} alt="Icon" />
 
                             <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>

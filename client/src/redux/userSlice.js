@@ -1,13 +1,40 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { useDispatch, } from 'react-redux';
+import axios from "axios";
+import { toast } from "react-toastify";
 
-
-const initialState = {
+export const initialState = {
     User: null,
     userToken: localStorage.getItem('userToken') || "",
-    userGlobalData: null,
+    userData: null,
     error: null,
     loading: false
 }
+
+
+
+export const fetchUserProfile = createAsyncThunk(
+    "user/fetchUserProfile",
+    async (userToken, { dispatch, rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(
+                import.meta.env.VITE_BACKEND_URL + "/api/user/get-profile",
+                { headers: { userToken } }
+            );
+
+            if (!data.success) {
+                toast.error(data.message);
+                return rejectWithValue(data.message);
+            }
+
+            toast.success(data.message);
+            return data.userData;
+        } catch (error) {
+            toast.error(error.message);
+            return rejectWithValue(error.message);
+        }
+    }
+);
 
 
 export const userSlice = createSlice({
@@ -31,13 +58,19 @@ export const userSlice = createSlice({
         setUserToken: (state, action) => {
             state.userToken = action.payload
         },
-        setGlobalData: (state, action) => {
-            state.userGlobalData = action.payload
+        setUserData: (state, action) => {
+            state.userData = { ...initialState.userData, ...action.payload }
+            // state.userData = action.payload
         }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchUserProfile.fulfilled, (state, action) => {
+            state.userData = { ...state.userData, ...action.payload };
+        });
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { signInStart, signInSuccess, signInFailure, setUserToken, setGlobalData } = userSlice.actions
+export const { signInStart, signInSuccess, signInFailure, setUserToken, setUserData } = userSlice.actions
 
 export default userSlice.reducer

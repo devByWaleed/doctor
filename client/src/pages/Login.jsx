@@ -6,7 +6,8 @@ import {
     signInStart,
     signInSuccess,
     signInFailure,
-    setUserToken
+    setUserToken,
+    fetchUserProfile
 } from '../redux/userSlice'
 import { useNavigate } from 'react-router-dom';
 
@@ -37,6 +38,7 @@ const Login = () => {
                 }
                 dispatch(signInSuccess(data));
                 dispatch(setUserToken(data.userToken));
+                dispatch(fetchUserProfile(loginResponse.token));
                 localStorage.setItem('userToken', data.userToken)
                 // console.log(data.userToken);
                 toast.success(data.message)
