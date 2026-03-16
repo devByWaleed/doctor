@@ -233,7 +233,7 @@ export const bookAppointment = async (req, res) => {
         await newAppointment.save()
 
         // Save new slots data in docData
-        await DoctorModel.findOneAndUpdate(docID, { slots_booked })
+        await DoctorModel.findOneAndUpdate({ _id: docID }, { slots_booked })
 
         return res.json({
             success: true,

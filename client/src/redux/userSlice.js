@@ -1,16 +1,13 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { useDispatch, } from 'react-redux';
-import axios from "axios";
-import { toast } from "react-toastify";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-export const initialState = {
+
+const initialState = {
     User: null,
     userToken: localStorage.getItem('userToken') || "",
-    userData: null,
+    doctors: [],
     error: null,
     loading: false
 }
-
 
 
 export const fetchUserProfile = createAsyncThunk(
@@ -61,6 +58,9 @@ export const userSlice = createSlice({
         setUserData: (state, action) => {
             // state.userData = { ...initialState.userData, ...action.payload }
             state.userData = action.payload
+        },
+        setDoctors: (state, action) => {
+            state.doctors = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -81,6 +81,6 @@ export const userSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { signInStart, signInSuccess, signInFailure, setUserToken, setUserData } = userSlice.actions
+export const { signInStart, signInSuccess, signInFailure, setUserToken, setUserData, setDoctors } = userSlice.actions
 
 export default userSlice.reducer

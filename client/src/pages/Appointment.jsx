@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { assets, doctors } from '../assets/assets'
+import { useNavigate, useParams } from 'react-router-dom'
+import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import axios from 'axios'
+import {
+    setDoctors
+} from '../redux/userSlice'
 
 const Appointment = () => {
 
@@ -11,11 +17,38 @@ const Appointment = () => {
     const [docSlots, setDocSlots] = useState([])
     const [slotIndex, setSlotIndex] = useState(0)
     const [slotTime, setSlotTime] = useState("")
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { userToken, doctors } = useSelector((state) => state.user);
+
 
     const fetchDocInfo = async () => {
-        const docInfo = doctors.find(doc => doc._id === docID)
-        setDocInfo(docInfo)
-        console.log(docInfo);
+
+        if (doctors && doctors.length > 0) {
+            const foundDoc = doctors.find(doc => doc._id === docID)
+            if (foundDoc) {
+                setDocInfo(foundDoc)
+                return // Exit early if found
+            }
+        }
+
+        try {
+            const { data } = await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/doctor/list")
+            if (data.success) {
+                // Update Redux so other components also have the data now
+                dispatch(setDoctors(data.message))
+
+                // Find the specific doctor from the fresh data
+                const foundDoc = data.message.find(doc => doc._id === docID)
+                setDocInfo(foundDoc)
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error("Failed to load doctor information")
+        }
 
     }
 
@@ -33,7 +66,7 @@ const Appointment = () => {
             currentDate.setDate(today.getDate() + i)
 
             // Setting end time in date with index
-            let endTime = new Date()
+            let endTime = new Date(currentDate)
             endTime.setDate(today.getDate() + i)
             endTime.setHours(21, 0, 0, 0)
 
@@ -62,6 +95,37 @@ const Appointment = () => {
 
             }
             setDocSlots(prev => ([...prev, timeSlots]))
+        }
+    }
+
+    const bookAppointment = async () => {
+        if (!userToken) {
+            toast.warn("Login to book appointment")
+            return navigate("/login")
+        }
+
+        try {
+            const date = docSlots[slotIndex][0].datetime
+
+            let day = date.getDate()
+            let month = date.getMonth() + 1
+            let year = date.getFullYear()
+
+            const slotDate = day + "_" + month + "_" + year
+            // console.log(slotDate);
+
+            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/book-appointment", { docID, slotDate, slotTime }, { headers: { userToken } })
+
+            if (data.success === false) {
+                toast.error(data.message)
+                return
+            }
+            // dispatch(setDoctors(data.message));
+            toast.success(data.message)
+            navigate("/my-appointments")
+
+        } catch (error) {
+            toast.error(error.message)
         }
     }
 
@@ -131,7 +195,9 @@ const Appointment = () => {
                     ))}
                 </div>
 
-                <button className='bg-primary text-white text-sm font-light px-20 py-3 rounded-full my-6'>
+                <button
+                    onClick={bookAppointment}
+                    className='bg-primary text-white text-sm font-light px-20 py-3 rounded-full my-6'>
                     Book an appointment
                 </button>
             </div>
