@@ -56,6 +56,7 @@ export const register = async (req, res) => {
 
         res.json({
             success: true,
+            message: "Account created",
             user: { email: user.email, name: user.name },
             userToken: userToken
         })
@@ -106,6 +107,7 @@ export const login = async (req, res) => {
 
         res.json({
             success: true,
+            message: "User logged in",
             user: { email: user.email, name: user.name },
             userToken: userToken
         })
@@ -128,8 +130,8 @@ export const getProfile = async (req, res) => {
         const userData = await UserModel.findById(userID).select("-password")
         res.json({
             success: true,
+            message: "Profile Fetched",
             userData,
-            // userToken: userToken
         })
     }
 

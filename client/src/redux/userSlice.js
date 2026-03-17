@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const initialState = {
-    User: null,
+    user: null,
     userToken: localStorage.getItem('userToken') || "",
     doctors: [],
     error: null,
@@ -10,8 +11,9 @@ const initialState = {
 }
 
 
-export const fetchUserProfile = createAsyncThunk(
-    "user/fetchUserProfile",
+// API calling method
+export const loadUserProfileData = createAsyncThunk(
+    "user/loadUserProfileData",
     async (userToken, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(
@@ -19,14 +21,17 @@ export const fetchUserProfile = createAsyncThunk(
                 { headers: { userToken } }
             );
 
+            // If failed
             if (!data.success) {
                 toast.error(data.message);
                 return rejectWithValue(data.message);
             }
 
+            // If succeed
             toast.success(data.message);
             return data.userData;
         } catch (error) {
+            // Handling error
             toast.error(error.message);
             return rejectWithValue(error.message);
         }
@@ -42,8 +47,8 @@ export const userSlice = createSlice({
             state.loading = true
         },
         signInSuccess: (state, action) => {
-            state.User = action.payload
             state.userToken = action.payload.token
+            state.user = action.payload.userData
             state.loading = false
             state.error = null
         },
@@ -55,25 +60,22 @@ export const userSlice = createSlice({
         setUserToken: (state, action) => {
             state.userToken = action.payload
         },
-        setUserData: (state, action) => {
-            // state.userData = { ...initialState.userData, ...action.payload }
-            state.userData = action.payload
-        },
         setDoctors: (state, action) => {
             state.doctors = action.payload
         }
     },
+    // Passing profile data to redux
     extraReducers: (builder) => {
         builder
-            .addCase(fetchUserProfile.pending, (state) => {
+            .addCase(loadUserProfileData.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchUserProfile.fulfilled, (state, action) => {
+            .addCase(loadUserProfileData.fulfilled, (state, action) => {
                 state.loading = false;
-                state.userData = action.payload; // Fixed: Direct assignment
+                state.user = action.payload;
             })
-            .addCase(fetchUserProfile.rejected, (state, action) => {
+            .addCase(loadUserProfileData.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

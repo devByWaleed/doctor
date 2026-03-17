@@ -1,9 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets.js'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    setUserToken
+    setUserToken,
+    loadUserProfileData
 } from '../redux/userSlice'
 
 const Navbar = () => {
@@ -11,13 +12,20 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const [showMenu, setShowMenu] = useState(false)
-    const { userToken, userData } = useSelector((state) => state.user);
+    const { userToken, user } = useSelector((state) => state.user);
     const dispatch = useDispatch();
 
     const logout = () => {
         dispatch(setUserToken(""))
         localStorage.removeItem("userToken")
+        navigate('/login')
     }
+
+    useEffect(() => {
+        if (userToken) {
+            dispatch(loadUserProfileData(userToken))
+        }
+    }, [userToken])
 
     return (
         <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400'>
@@ -49,7 +57,7 @@ const Navbar = () => {
                 {
                     userToken ?
                         <div className='flex items-center gap-2 cursor-pointer group relative'>
-                            <img className='w-8 rounded-full' src={assets.upload_icon} alt="Pic" />
+                            <img className='w-8 rounded-full' src={user?.image} alt="Pic" />
                             <img className='w-2.5 cursor-pointer' src={assets.dropdown_icon} alt="Icon" />
 
                             <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>

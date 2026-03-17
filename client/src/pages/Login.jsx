@@ -6,8 +6,7 @@ import {
     signInStart,
     signInSuccess,
     signInFailure,
-    setUserToken,
-    fetchUserProfile
+    setUserToken
 } from '../redux/userSlice'
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +17,7 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const { userToken, loading, error } = useSelector((state) => state.user);
+    const { userToken, loading, user } = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -28,6 +27,7 @@ const Login = () => {
 
         try {
             if (state === "register") {
+                dispatch(signInStart())
                 const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/register", { name, email, password })
 
                 if (data.success === false) {
@@ -36,14 +36,14 @@ const Login = () => {
                     return
 
                 }
-
-                dispatch(signInStart())
-                dispatch(signInSuccess(data))
-                dispatch(fetchUserProfile(userToken)) // Fetch profile after login
+                dispatch(signInSuccess(data));
+                dispatch(setUserToken(data.userToken));
                 localStorage.setItem('userToken', data.userToken)
+                // console.log(data.userToken);
                 toast.success(data.message)
 
             } else {
+                dispatch(signInStart())
                 const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/login", { email, password })
 
                 if (data.success === false) {
@@ -52,10 +52,8 @@ const Login = () => {
                     return
 
                 }
-
-                dispatch(signInStart())
-                dispatch(signInSuccess(data))
-                dispatch(fetchUserProfile(userToken)) // Fetch profile after login
+                dispatch(signInSuccess(data));
+                dispatch(setUserToken(data.userToken));
                 localStorage.setItem('userToken', data.userToken)
                 toast.success(data.message)
             }
@@ -65,21 +63,11 @@ const Login = () => {
 
     }
 
-    // FIXED: Only navigate if we have userData (profile loaded)
     useEffect(() => {
-        if (userToken && userData) {
+        if (userToken) {
             navigate("/")
         }
-    }, [userToken, userData, navigate])
-
-    // Don't render form if already authenticated
-    if (userToken && userData) {
-        return (
-            <div className="min-h-[80vh] flex items-center justify-center">
-                <div>Redirecting...</div>
-            </div>
-        )
-    }
+    }, [userToken])
 
 
 
@@ -103,8 +91,9 @@ const Login = () => {
                     <p>Password</p>
                     <input onChange={(e) => setPassword(e.target.value)} value={password} placeholder="Type Password" className="border border-[#DADADA] rounded w-full p-2 mt-1" type="password" required />
                 </div>
-                <button disabled={loading} type='submit' className="bg-primary text-white w-full py-2 my-2 rounded-md text-base">
-                    {state === "register" ? "Create Account" : "Login"}
+                <button disabled={loading} type='submit' className="bg-primary text-white w-full py-2 my-2 rounded-md text-base disabled:opacity-80">
+                    {/* {state === "register" ? "Create Account" : "Login"} */}
+                    {loading ? 'Loading...' : 'Login'}
                 </button>
 
                 {state === "register" ? (
