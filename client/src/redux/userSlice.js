@@ -28,7 +28,7 @@ export const loadUserProfileData = createAsyncThunk(
             }
 
             // If succeed
-            toast.success(data.message);
+            toast.success(data.message);    // Can be removed
             return data.userData;
         } catch (error) {
             // Handling error

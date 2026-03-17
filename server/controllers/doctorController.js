@@ -31,7 +31,8 @@ export const doctorList = async (req, res) => {
 
         return res.json({
             success: true,
-            message: doctors
+            message: "Doctors fetched successfully",
+            doctors
         })
 
     } catch (error) {

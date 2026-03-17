@@ -21,11 +21,14 @@ const Navbar = () => {
         navigate('/login')
     }
 
-    useEffect(() => {
-        if (userToken) {
-            dispatch(loadUserProfileData(userToken))
-        }
-    }, [userToken])
+
+    // Only fetch if we have a token AND we don't have the user data yet
+    // useEffect(() => {
+    //     if (userToken && !user) {
+    //         dispatch(loadUserProfileData(userToken))
+    //     }
+    // }, [userToken, user, dispatch]) // Added 'user' to dependency
+
 
     return (
         <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400'>
@@ -57,7 +60,7 @@ const Navbar = () => {
                 {
                     userToken ?
                         <div className='flex items-center gap-2 cursor-pointer group relative'>
-                            <img className='w-8 rounded-full' src={user?.image} alt="Pic" />
+                            <img className='w-8 rounded-full' src={user ? user.image : assets.default_profile} alt="Pic" />
                             <img className='w-2.5 cursor-pointer' src={assets.dropdown_icon} alt="Icon" />
 
                             <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>

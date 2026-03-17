@@ -33,8 +33,8 @@ const Doctors = () => {
                 return
 
             }
-            dispatch(setDoctors(data.message));
             toast.success(data.message)
+            dispatch(setDoctors(data.doctors));
 
 
         } catch (error) {
@@ -58,7 +58,7 @@ const Doctors = () => {
                     onClick={() => setShowFilter(prev => !prev)}>Filters</button>
                 <div className={`flex-col gap-4 text-sm text-gray-600 ${showFilter ? 'flex' : 'hidden sm:flex'}`}>
                     {specialityData.map((item, index) => (
-                        <p key={index} onClick={() => speciality === `${item.speciality}` ? navigate('/doctors') : navigate(`/doctors/${item.speciality}`)} className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${speciality === item.speciality ? "bg-indigo-100 text-black" : ""}`}>{item.speciality}</p>
+                        <p key={index} onClick={() => speciality === item.speciality ? navigate('/doctors') : navigate(`/doctors/${item.speciality}`)} className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${speciality === item.speciality ? "bg-indigo-100 text-black" : ""}`}>{item.speciality}</p>
                     ))}
                 </div>
 
@@ -69,8 +69,16 @@ const Doctors = () => {
                                 <img src={item.image} alt="" className='bg-[#EAEFFF]' />
                                 <div className="p-4">
                                     <div className='flex items-center gap-2 text-sm text-center text-green-500'>
-                                        <p className='w-2 h-2 rounded-full bg-green-500'></p>
-                                        <p>Available</p>
+                                        {item.available ?
+                                            <>
+                                                <p className='w-2 h-2 rounded-full bg-green-500'></p>
+                                                <p>Available</p>
+                                            </> :
+                                            <>
+                                                <p className='w-2 h-2 rounded-full bg-red-500'></p>
+                                                <p>Not Available</p>
+                                            </>
+                                        }
                                     </div>
 
                                     <p className='text-[#262626] text-lg font-medium'>{item.name}</p>
