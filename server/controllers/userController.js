@@ -250,3 +250,66 @@ export const bookAppointment = async (req, res) => {
         })
     }
 }
+
+
+
+// List appointment : /api/user/appointments
+export const listAppointment = async (req, res) => {
+    try {
+        const userID = req.userID;
+        const appointments = await AppointmentModel.find({ userID })
+        return res.json({
+            success: true,
+            message: "Appointment fetched",
+            appointments
+        })
+    } catch (error) {
+        console.log(error.message);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+// Cancel appointment : /api/user/cancel-appointment
+export const cancelAppointment = async (req, res) => {
+    try {
+        const userID = req.userID;
+        const { appointmentID } = req.body
+        const appointmentData = await AppointmentModel.findById(appointmentID)
+
+        // Verify appointments user
+        if (appointmentData.userID !== userID) {
+            return res.json({
+                success: false,
+                message: "Unauthorized action"
+            })
+        }
+
+        await AppointmentModel.findByIdAndUpdate(appointmentID, { cancelled: true })
+
+        // Releasing doctor slot
+        const { docID, slotDate, slotTime } = appointmentData
+
+        const doctorData = await DoctorModel.findById(docID)
+
+        // Filtering cancelled slots
+        let slots_booked = doctorData.slots_booked
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
+
+        await DoctorModel.findByIdAndUpdate(docID, { slots_booked })
+
+        return res.json({
+            success: true,
+            message: "Appointment cancelled"
+        })
+    } catch (error) {
+        console.log(error.message);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}

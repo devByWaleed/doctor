@@ -10,6 +10,7 @@ const initialState = {
     loading: false
 }
 
+export const backendURL = import.meta.env.VITE_BACKEND_URL
 
 // API calling method
 export const loadUserProfileData = createAsyncThunk(

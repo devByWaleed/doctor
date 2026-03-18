@@ -40,7 +40,7 @@ const Appointment = () => {
                 dispatch(setDoctors(data.message))
 
                 // Find the specific doctor from the fresh data
-                const foundDoc = data.message.find(doc => doc._id === docID)
+                const foundDoc = data.doctors.find(doc => doc._id === docID)
                 setDocInfo(foundDoc)
             } else {
                 toast.error(data.message)
