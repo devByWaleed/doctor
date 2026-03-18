@@ -9,6 +9,7 @@ const initialState = {
     loading: false
 }
 
+export const backendURL = import.meta.env.VITE_BACKEND_URL
 
 export const adminSlice = createSlice({
     name: 'admin',

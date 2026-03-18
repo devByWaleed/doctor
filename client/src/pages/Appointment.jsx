@@ -4,9 +4,10 @@ import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { backendURL, currency } from '../redux/userSlice'
 import axios from 'axios'
 import {
-    setDoctors
+    getDoctorsData
 } from '../redux/userSlice'
 
 const Appointment = () => {
@@ -34,10 +35,10 @@ const Appointment = () => {
         }
 
         try {
-            const { data } = await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/doctor/list")
+            const { data } = await axios.get(backendURL + "/api/doctor/list")
             if (data.success) {
                 // Update Redux so other components also have the data now
-                dispatch(setDoctors(data.message))
+                dispatch(getDoctorsData(data.message))
 
                 // Find the specific doctor from the fresh data
                 const foundDoc = data.doctors.find(doc => doc._id === docID)
@@ -114,13 +115,12 @@ const Appointment = () => {
             const slotDate = day + "_" + month + "_" + year
             // console.log(slotDate);
 
-            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/book-appointment", { docID, slotDate, slotTime }, { headers: { userToken } })
+            const { data } = await axios.post(backendURL + "/api/user/book-appointment", { docID, slotDate, slotTime }, { headers: { userToken } })
 
             if (data.success === false) {
                 toast.error(data.message)
                 return
             }
-            // dispatch(setDoctors(data.message));
             toast.success(data.message)
             navigate("/my-appointments")
 
@@ -169,7 +169,7 @@ const Appointment = () => {
                         <p className='text-sm text-gray-600 max-w-175 mt-1'>{docInfo.about}</p>
                     </div>
                     <p className='text-gray-500 font-medium mt-4'>
-                        Appointment fee: <span className='text-gray-600'>{docInfo.fees}</span>
+                        Appointment fee: <span className='text-gray-600'>{docInfo.fees} {currency}</span>
                     </p>
                 </div>
             </div>

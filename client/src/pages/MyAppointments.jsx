@@ -1,9 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { backendURL } from '../redux/userSlice'
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
 
 const MyAppointments = () => {
     const { userToken } = useSelector((state) => state.user);

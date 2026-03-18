@@ -3,7 +3,8 @@ import { assets } from '../assets/assets'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux';
-import { loadUserProfileData, signInSuccess } from '../redux/userSlice';
+import { loadUserProfileData } from '../redux/userSlice';
+import { backendURL } from '../redux/userSlice'
 
 const MyProfile = () => {
     const { userToken, user } = useSelector((state) => state.user);
@@ -28,7 +29,7 @@ const MyProfile = () => {
 
             image && formData.append("image", image)
 
-            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/update-profile", formData, { headers: { userToken } })
+            const { data } = await axios.post(backendURL + "/api/user/update-profile", formData, { headers: { userToken } })
 
             if (data.success === false) {
                 toast.error(data.message)

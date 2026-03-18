@@ -4,6 +4,7 @@ import { specialityData } from '../../../../client/src/assets/assets'
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { backendURL } from '../../features/admin/adminSlice'
 
 const AddDoctor = () => {
 
@@ -51,7 +52,7 @@ const AddDoctor = () => {
                 console.log(`${key} : ${value}`);
             });
 
-            const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/admin/add-doctor', formData, { headers: { adminToken } })
+            const { data } = await axios.post(backendURL + '/api/admin/add-doctor', formData, { headers: { adminToken } })
 
             if (data.success) {
                 toast.success(data.message)
@@ -72,7 +73,7 @@ const AddDoctor = () => {
                 toast.error(data.message)
             }
         } catch (error) {
-
+            toast.error(error.message)
         }
 
     }
@@ -226,20 +227,20 @@ const AddDoctor = () => {
                         </div>
                     </div>
 
-                    <div className='flex-1 flex flex-col gap-1'>
-                        <p className='mt-4 mb-2'>About Doctor</p>
-                        <textarea
-                            id='about'
-                            onChange={(e) => setFormInput({
-                                ...formInput,
-                                [e.target.id]: e.target.value
-                            })}
-                            value={formInput.about}
-                            className='w-full x-4 pt-2 border rounded' placeholder='Write About Doctor' rows={5} required />
-                    </div>
-
-                    <button type='Submit' className='bg-primary px-10 py-3 mt-4 text-white rounded-full'>Add Doctor</button>
                 </div>
+                <div className='flex-1 flex flex-col gap-1'>
+                    <p className='mt-4 mb-2'>About Doctor</p>
+                    <textarea
+                        id='about'
+                        onChange={(e) => setFormInput({
+                            ...formInput,
+                            [e.target.id]: e.target.value
+                        })}
+                        value={formInput.about}
+                        className='w-full px-4 pt-2 border rounded' placeholder='Write About Doctor' rows={5} required />
+                </div>
+
+                <button type='submit' className='bg-primary px-10 py-3 mt-4 text-white rounded-full'>Add Doctor</button>
             </div>
         </form>
     )

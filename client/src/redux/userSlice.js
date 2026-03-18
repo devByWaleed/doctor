@@ -11,6 +11,7 @@ const initialState = {
 }
 
 export const backendURL = import.meta.env.VITE_BACKEND_URL
+export const currency = "Rs"
 
 // API calling method
 export const loadUserProfileData = createAsyncThunk(
@@ -40,6 +41,26 @@ export const loadUserProfileData = createAsyncThunk(
 );
 
 
+export const getDoctorsData = createAsyncThunk(
+    "user/getDoctorsData",
+    async (_, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(backendURL + "/api/doctor/list");
+
+            if (data.success === false) {
+                toast.error(data.message);
+                return rejectWithValue(data.message);
+            }
+            return data.doctors;
+
+        } catch (error) {
+            toast.error(error.message);
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+
 export const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -60,9 +81,6 @@ export const userSlice = createSlice({
         // This is how you "set" the token globally
         setUserToken: (state, action) => {
             state.userToken = action.payload
-        },
-        setDoctors: (state, action) => {
-            state.doctors = action.payload
         }
     },
     // Passing profile data to redux
@@ -79,11 +97,22 @@ export const userSlice = createSlice({
             .addCase(loadUserProfileData.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(getDoctorsData.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getDoctorsData.fulfilled, (state, action) => {
+                state.loading = false;
+                state.doctors = action.payload;
+            })
+            .addCase(getDoctorsData.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     }
 })
 
 // Action creators are generated for each case reducer function
-export const { signInStart, signInSuccess, signInFailure, setUserToken, setUserData, setDoctors } = userSlice.actions
+export const { signInStart, signInSuccess, signInFailure, setUserToken, setUserData } = userSlice.actions
 
 export default userSlice.reducer

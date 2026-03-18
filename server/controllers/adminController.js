@@ -62,12 +62,9 @@ export const addDoctor = async (req, res) => {
 
         return res.json({
             success: true,
-            message: doctorData
+            message: "Doctor added",
+            doctorData
         })
-
-
-        // console.log({ name, email, password, speciality, degree, experience, about, fees, address });
-        // console.log(imageFile);
 
     } catch (error) {
         console.log(error);
@@ -123,7 +120,7 @@ export const allDoctors = async (req, res) => {
         const doctors = await DoctorModel.find({}).select("-password")
         return res.json({
             success: true,
-            message: doctors
+            doctors
         })
 
     } catch (error) {

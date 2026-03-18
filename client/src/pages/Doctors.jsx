@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { specialityData } from '../assets/assets'
-import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux';
-import { setDoctors } from '../redux/userSlice'
-import axios from 'axios'
+import { getDoctorsData } from '../redux/userSlice'
 
 const Doctors = () => {
     const { speciality } = useParams()
@@ -24,31 +22,13 @@ const Doctors = () => {
         }
     }
 
-    const getDoctorsData = async () => {
-        try {
-            const { data } = await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/doctor/list")
-
-            if (data.success === false) {
-                toast.error(data.message)
-                return
-
-            }
-            toast.success(data.message)
-            dispatch(setDoctors(data.doctors));
-
-
-        } catch (error) {
-            toast.error(error.message)
-        }
-    }
-
     useEffect(() => {
         applyFilter()
     }, [doctors, speciality])
 
     useEffect(() => {
-        getDoctorsData()
-    }, [])
+        dispatch(getDoctorsData());
+    }, [dispatch])
 
     return (
         <div>

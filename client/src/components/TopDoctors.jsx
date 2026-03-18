@@ -1,9 +1,16 @@
-import React from 'react'
-import { doctors } from '../assets/assets'
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getDoctorsData } from '../redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const TopDoctors = () => {
+    const { doctors } = useSelector((state) => state.user);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getDoctorsData());
+    }, [dispatch])
 
     return (
         <div className='flex flex-col items-center gap-4 my-16 text-[#262626] md:mx-10'>

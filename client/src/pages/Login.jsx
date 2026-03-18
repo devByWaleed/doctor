@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux';
+import { backendURL } from '../redux/userSlice'
 import {
     signInStart,
     signInSuccess,
@@ -17,7 +18,7 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const { userToken, loading, user } = useSelector((state) => state.user);
+    const { userToken, loading } = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -28,7 +29,7 @@ const Login = () => {
         try {
             if (state === "register") {
                 dispatch(signInStart())
-                const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/register", { name, email, password })
+                const { data } = await axios.post(backendURL + "/api/user/register", { name, email, password })
 
                 if (data.success === false) {
                     dispatch(signInFailure(data.message))
@@ -44,7 +45,7 @@ const Login = () => {
 
             } else {
                 dispatch(signInStart())
-                const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/user/login", { email, password })
+                const { data } = await axios.post(backendURL + "/api/user/login", { email, password })
 
                 if (data.success === false) {
                     dispatch(signInFailure(data.message))

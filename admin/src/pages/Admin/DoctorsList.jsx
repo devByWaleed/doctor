@@ -20,11 +20,7 @@ const DoctorsList = () => {
                 return
 
             }
-            dispatch(setDoctors(data.message));
-
-            toast.success(data.message)
-            console.log(data.message);
-
+            dispatch(setDoctors(data.doctors));
 
         } catch (error) {
             toast.error(error.message)
