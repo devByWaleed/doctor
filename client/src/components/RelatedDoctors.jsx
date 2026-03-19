@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { doctors } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux';
 
 const RelatedDoctors = ({ docID, speciality }) => {
     const [relDocs, setRelDocs] = useState([])
+    const { doctors } = useSelector((state) => state.user);
     const navigate = useNavigate()
 
     useEffect(() => {
         if (doctors.length > 0 && speciality) {
-
             // Filtering doctors by speciality 
             const doctorsData = doctors.filter((doc) => doc.speciality === speciality && doc._id !== docID)
             setRelDocs(doctorsData);

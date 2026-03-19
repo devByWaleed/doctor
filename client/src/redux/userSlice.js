@@ -19,7 +19,7 @@ export const loadUserProfileData = createAsyncThunk(
     async (userToken, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(
-                import.meta.env.VITE_BACKEND_URL + "/api/user/get-profile",
+                backendURL + "/api/user/get-profile",
                 { headers: { userToken } }
             );
 

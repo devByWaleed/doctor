@@ -74,7 +74,7 @@ const Login = () => {
 
                 <button
                     disabled={loading}
-                    className='bg-primary text-white w-full py-2 rounded-md text-base'>
+                    className='bg-primary text-white w-full py-2 rounded-md text-base disabled:opacity-80'>
                     {loading ? 'Loading...' : 'Login'}
                 </button>
                 {state === "Admin" ?
