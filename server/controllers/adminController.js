@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary"
 import DoctorModel from "../models/Doctor.js"
 import jwt from "jsonwebtoken"
 import AppointmentModel from "../models/Appointment.js"
+import UserModel from "../models/User.js"
 
 // Add Doctor : /api/admin/add-doctor
 export const addDoctor = async (req, res) => {
@@ -145,6 +146,69 @@ export const appointmentsAdmin = async (req, res) => {
 
     } catch (error) {
         console.log(error);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+// Cancel appointment : /api/admin/cancel-appointment
+export const appointmentCancel = async (req, res) => {
+    try {
+        const { appointmentID } = req.body
+        const appointmentData = await AppointmentModel.findById(appointmentID)
+
+
+        await AppointmentModel.findByIdAndUpdate(appointmentID, { cancelled: true })
+
+        // Releasing doctor slot
+        const { docID, slotDate, slotTime } = appointmentData
+
+        const doctorData = await DoctorModel.findById(docID)
+
+        // Filtering cancelled slots
+        let slots_booked = doctorData.slots_booked
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
+
+        await DoctorModel.findByIdAndUpdate(docID, { slots_booked })
+
+        return res.json({
+            success: true,
+            message: "Appointment cancelled"
+        })
+    } catch (error) {
+        console.log(error.message);
+        return res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
+// Dashboard data for admin : /api/admin/dashboard
+export const adminDashboard = async (req, res) => {
+    try {
+        const doctors = await DoctorModel.find({})
+        const users = await UserModel.find({})
+        const appointments = await AppointmentModel.find({})
+
+        const dashData = {
+            doctors: doctors.length,
+            appointments: appointments.length,
+            patients: users.length,
+            latestAppointments: appointments.reverse().slice(0, 5)
+        }
+
+        return res.json({
+            success: true,
+            dashData
+        })
+
+    } catch (error) {
+        console.log(error.message);
         return res.json({
             success: false,
             message: error.message

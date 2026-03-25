@@ -1,19 +1,32 @@
 import { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import {
     signInStart,
     signInSuccess,
     signInFailure,
-    setAdminToken
+    setAdminToken,
+    backendURL
 } from '../features/admin/adminSlice'
+import {
+    doctorSignInStart,
+    doctorSignInSuccess,
+    doctorSignInFailure,
+    setDoctorToken
+} from '../features/doctors/doctorSlice'
 
 const Login = () => {
     const [state, setState] = useState('Admin')
 
     const { loading, error } = useSelector((state) => state.admin);
+    const { doctorLoading, doctorError, doctorToken } = useSelector((state) => state.doctor);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const isLoading = state === "Admin" ? loading : doctorLoading;
+    const currentError = state === "Admin" ? error : doctorError;
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -24,7 +37,7 @@ const Login = () => {
         try {
             if (state === "Admin") {
                 dispatch(signInStart());
-                const { data } = await axios.post(import.meta.env.VITE_BACKEND_URL + "/api/admin/login", { email, password })
+                const { data } = await axios.post(backendURL + "/api/admin/login", { email, password })
 
                 if (data.success === false) {
                     dispatch(signInFailure(data.message))
@@ -35,14 +48,35 @@ const Login = () => {
                 dispatch(signInSuccess(data));
                 dispatch(setAdminToken(data.adminToken));
                 localStorage.setItem('adminToken', data.adminToken)
+                navigate("/admin-dashboard")
                 console.log(data.adminToken);
                 toast.success(data.message)
             }
-            // else {
+            else {
+                dispatch(doctorSignInStart());
+                const { data } = await axios.post(backendURL + "/api/doctor/login", { email, password })
 
-            // }
+                if (data.success === false) {
+                    dispatch(doctorSignInFailure(data.message))
+                    toast.error(data.message)
+                    return
+
+                }
+                dispatch(doctorSignInSuccess(data));
+                dispatch(setDoctorToken(data.doctorToken));
+                localStorage.setItem('doctorToken', data.doctorToken)
+                navigate("/doctor-dashboard")
+                console.log(data.doctorToken);
+                toast.success(data.message)
+            }
         } catch (error) {
-            dispatch(signInFailure(error.message));
+            const errorMessage = error.response?.data?.message || error.message;
+            if (state === "Admin") {
+                dispatch(signInFailure(errorMessage));
+            } else {
+                dispatch(doctorSignInFailure(errorMessage));
+            }
+            toast.error(errorMessage);
         }
     }
 
@@ -60,7 +94,7 @@ const Login = () => {
                     <input
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
-                        disabled={loading}
+                        disabled={isLoading}
                         className='border border-[#DADADA] rounded w-full p-2 mt-1' type="email" required />
                 </div>
                 <div className='w-full'>
@@ -68,12 +102,12 @@ const Login = () => {
                     <input
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
-                        disabled={loading}
+                        disabled={isLoading}
                         className='border border-[#DADADA] rounded w-full p-2 mt-1' type="password" required />
                 </div>
 
                 <button
-                    disabled={loading}
+                    disabled={isLoading}
                     className='bg-primary text-white w-full py-2 rounded-md text-base disabled:opacity-80'>
                     {loading ? 'Loading...' : 'Login'}
                 </button>
@@ -86,7 +120,7 @@ const Login = () => {
                         Admin Login? <span onClick={() => setState("Admin")} className="text-primary underline cursor-pointer">Click here</span>
                     </p>
                 }
-                {error && <p className='text-red-500 mt-5'>{error}</p>}
+                {currentError && <p className='text-red-500 mt-5'>{currentError}</p>}
             </div>
         </form>
     )

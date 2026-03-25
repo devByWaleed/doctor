@@ -7,12 +7,14 @@ const initialState = {
     adminToken: localStorage.getItem('adminToken') || "",
     doctors: [],
     appointments: [],
+    dashData: false,
     error: null,
     loading: false
 }
 
 export const backendURL = import.meta.env.VITE_BACKEND_URL
 export const currency = "Rs"
+
 
 // API calling method
 export const getAllAppointments = createAsyncThunk(
@@ -31,6 +33,57 @@ export const getAllAppointments = createAsyncThunk(
             }
 
             return data.appointments;
+        } catch (error) {
+            // Handling error
+            toast.error(error.message);
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+
+export const getDashData = createAsyncThunk(
+    "user/getDashData",
+    async (adminToken, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(
+                backendURL + "/api/admin/dashboard",
+                { headers: { adminToken } }
+            );
+
+            // If failed
+            if (!data.success) {
+                toast.error(data.message);
+                return rejectWithValue(data.message);
+            }
+
+            console.log(data.dashData);
+
+            return data.dashData;
+        } catch (error) {
+            // Handling error
+            toast.error(error.message);
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+
+export const cancelAppointment = createAsyncThunk(
+    "user/cancelAppointment",
+    async (adminToken, appointmentID, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.post(backendURL + "/api/admin/cancel-appointment", { appointmentID }, { headers: { adminToken } })
+
+
+            // If failed
+            if (!data.success) {
+                toast.error(data.message);
+                return rejectWithValue(data.message);
+            }
+
+            toast.success(data.message)
+            dispatch(getAllAppointments(adminToken))
         } catch (error) {
             // Handling error
             toast.error(error.message);
@@ -76,6 +129,30 @@ export const adminSlice = createSlice({
                 state.appointments = action.payload;
             })
             .addCase(getAllAppointments.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(getDashData.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getDashData.fulfilled, (state, action) => {
+                state.loading = false;
+                state.dashData = action.payload;
+            })
+            .addCase(getDashData.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(cancelAppointment.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(cancelAppointment.fulfilled, (state, action) => {
+                state.loading = false;
+                state.appointments = action.payload;
+            })
+            .addCase(cancelAppointment.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })

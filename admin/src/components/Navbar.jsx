@@ -1,18 +1,21 @@
-import React from 'react'
 import { assets } from '../assets/assets'
 import { useDispatch, useSelector } from 'react-redux';
 import { setAdminToken } from '../features/admin/adminSlice';
+import { setDoctorToken } from '../features/doctors/doctorSlice';
 import { useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
-    const dispatch = useDispatch();
     const { adminToken } = useSelector((state) => state.admin);
+    const { doctorToken } = useSelector((state) => state.doctor);
+    const dispatch = useDispatch();
     const navigate = useNavigate()
 
     const logout = () => {
         navigate('/')
         adminToken && dispatch(setAdminToken(""))
         adminToken && localStorage.removeItem("adminToken")
+        doctorToken && dispatch(setDoctorToken(""))
+        doctorToken && localStorage.removeItem("doctorToken")
     }
 
     return (
