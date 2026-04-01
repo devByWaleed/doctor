@@ -13,7 +13,7 @@ const initialState = {
 }
 
 export const backendURL = import.meta.env.VITE_BACKEND_URL
-export const currency = "Rs"
+export const currency = "SGD"
 
 
 // API calling method

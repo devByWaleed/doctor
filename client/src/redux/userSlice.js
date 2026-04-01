@@ -7,11 +7,12 @@ const initialState = {
     userToken: localStorage.getItem('userToken') || "",
     doctors: [],
     error: null,
-    loading: false
+    profileLoading: false,
+    doctorsLoading: false,
 }
 
 export const backendURL = import.meta.env.VITE_BACKEND_URL
-export const currency = "Rs"
+export const currency = "SGD"
 
 // API calling method
 export const loadUserProfileData = createAsyncThunk(
@@ -30,7 +31,6 @@ export const loadUserProfileData = createAsyncThunk(
             }
 
             // If succeed
-            toast.success(data.message);    // Can be removed
             return data.userData;
         } catch (error) {
             // Handling error
@@ -69,7 +69,7 @@ export const userSlice = createSlice({
             state.loading = true
         },
         signInSuccess: (state, action) => {
-            state.userToken = action.payload.token
+            state.userToken = action.payload.token || action.payload.userToken
             state.user = action.payload.userData
             state.loading = false
             state.error = null
@@ -87,32 +87,32 @@ export const userSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(loadUserProfileData.pending, (state) => {
-                state.loading = true;
+                state.profileLoading = true;
                 state.error = null;
             })
             .addCase(loadUserProfileData.fulfilled, (state, action) => {
-                state.loading = false;
+                state.profileLoading = false;
                 state.user = action.payload;
             })
             .addCase(loadUserProfileData.rejected, (state, action) => {
-                state.loading = false;
+                state.profileLoading = false;
                 state.error = action.payload;
             })
             .addCase(getDoctorsData.pending, (state) => {
-                state.loading = true;
+                state.doctorsLoading = true;
             })
             .addCase(getDoctorsData.fulfilled, (state, action) => {
-                state.loading = false;
+                state.doctorsLoading = false;
                 state.doctors = action.payload;
             })
             .addCase(getDoctorsData.rejected, (state, action) => {
-                state.loading = false;
+                state.doctorsLoading = false;
                 state.error = action.payload;
             })
     }
 })
 
 // Action creators are generated for each case reducer function
-export const { signInStart, signInSuccess, signInFailure, setUserToken, setUserData } = userSlice.actions
+export const { signInStart, signInSuccess, signInFailure, setUserToken } = userSlice.actions
 
 export default userSlice.reducer

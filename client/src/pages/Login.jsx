@@ -38,9 +38,8 @@ const Login = () => {
 
                 }
                 dispatch(signInSuccess(data));
-                dispatch(setUserToken(data.userToken));
-                localStorage.setItem('userToken', data.userToken)
-                // console.log(data.userToken);
+                localStorage.setItem('userToken', data.token || data.userToken)
+                navigate("/")
                 toast.success(data.message)
 
             } else {
@@ -54,8 +53,8 @@ const Login = () => {
 
                 }
                 dispatch(signInSuccess(data));
-                dispatch(setUserToken(data.userToken));
-                localStorage.setItem('userToken', data.userToken)
+                localStorage.setItem('userToken', data.token || data.userToken)
+                navigate("/")
                 toast.success(data.message)
             }
         } catch (error) {

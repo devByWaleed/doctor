@@ -6,6 +6,7 @@ import adminRouter from './routes/adminRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
 import doctorRouter from './routes/doctorRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import { stripeWebhooks } from './controllers/userController.js';
 
 
 // Configuring server
@@ -15,10 +16,12 @@ const port = process.env.PORT || 4000;
 await connectDB();
 await connectCloudinary();
 
+app.use(cors());
+
+app.post('/api/user/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhooks);
+
 // Middleware configuration
 app.use(express.json());
-// app.use(cookieParser());
-app.use(cors());
 
 
 // API endpoints

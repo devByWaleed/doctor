@@ -9,8 +9,10 @@ const TopDoctors = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getDoctorsData());
-    }, [dispatch])
+        if (doctors.length === 0) {
+            dispatch(getDoctorsData());
+        }
+    }, [dispatch, doctors.length])
 
     return (
         <div className='flex flex-col items-center gap-4 my-16 text-[#262626] md:mx-10'>

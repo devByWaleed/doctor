@@ -23,11 +23,11 @@ const Navbar = () => {
 
 
     // Only fetch if we have a token AND we don't have the user data yet
-    // useEffect(() => {
-    //     if (userToken && !user) {
-    //         dispatch(loadUserProfileData(userToken))
-    //     }
-    // }, [userToken, user, dispatch]) // Added 'user' to dependency
+    useEffect(() => {
+        if (userToken) {
+            dispatch(loadUserProfileData(userToken))
+        }
+    }, [userToken, dispatch]) // Added 'user' to dependency
 
 
     return (

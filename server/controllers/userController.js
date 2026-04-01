@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import validator from "validator"
 import { v2 as cloudinary } from "cloudinary"
 import AppointmentModel from "../models/Appointment.js";
+import stripe from 'stripe';
 
 // User registration : /api/user/register
 export const register = async (req, res) => {
@@ -313,3 +314,81 @@ export const cancelAppointment = async (req, res) => {
         })
     }
 }
+
+
+const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+
+export const paymentStripe = async (req, res) => {
+    try {
+        const { appointmentId } = req.body;
+        const { origin } = req.headers;
+
+        const appointmentData = await AppointmentModel.findById(appointmentId);
+
+        if (!appointmentData || appointmentData.cancelled) {
+            return res.json({ success: false, message: "Appointment not found or cancelled" });
+        }
+
+        // Create line items for Stripe
+        const line_items = [{
+            price_data: {
+                currency: 'sgd', // or 'usd' / 'sgd'
+                product_data: {
+                    name: `Appointment with ${appointmentData.docData.name}`,
+                    description: `Slot: ${appointmentData.slotDate} at ${appointmentData.slotTime}`
+                },
+                unit_amount: appointmentData.amount * 100, // Amount in cents
+            },
+            quantity: 1,
+        }];
+
+        const session = await stripeInstance.checkout.sessions.create({
+            line_items,
+            mode: 'payment',
+            success_url: `${origin}/my-appointments?success=true`,
+            cancel_url: `${origin}/my-appointments?success=false`,
+            metadata: { appointmentId } // CRITICAL: This links the payment to the DB
+        });
+
+        res.json({ success: true, session_url: session.url });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+
+export const stripeWebhooks = async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+        // req.body MUST be the raw buffer (see Server Configuration below)
+        event = stripeInstance.webhooks.constructEvent(
+            req.body,
+            sig,
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
+    } catch (err) {
+        console.error(`❌ Webhook Error: ${err.message}`);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the checkout.session.completed event
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const { appointmentId } = session.metadata;
+
+        try {
+            await AppointmentModel.findByIdAndUpdate(appointmentId, { payment: true });
+            await AppointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true });
+            console.log(`✅ Appointment ${appointmentId} updated to Paid and Completed.`);
+        } catch (dbError) {
+            console.error("❌ DB Update Failed:", dbError.message);
+            return res.status(500).json({ success: false });
+        }
+    }
+
+    res.status(200).json({ received: true });
+};

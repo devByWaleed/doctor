@@ -27,8 +27,10 @@ const Doctors = () => {
     }, [doctors, speciality])
 
     useEffect(() => {
-        dispatch(getDoctorsData());
-    }, [dispatch])
+        if (doctors.length === 0) {
+            dispatch(getDoctorsData());
+        }
+    }, [dispatch, doctors.length])
 
     return (
         <div>

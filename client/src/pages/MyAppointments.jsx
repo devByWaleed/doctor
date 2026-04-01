@@ -51,6 +51,30 @@ const MyAppointments = () => {
         }
     }
 
+    const appointmentStripe = async (appointmentId) => {
+        try {
+            // 1. Call your backend to create a Stripe Session
+            const { data } = await axios.post(
+                backendURL + '/api/user/payment-stripe',
+                { appointmentId },
+                { headers: { userToken } }
+            );
+
+            if (data.success) {
+                // 2. Extract the session URL from the response
+                const { session_url } = data;
+
+                // 3. Redirect the user to Stripe's hosted checkout page
+                window.location.replace(session_url);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
+    };
+
     useEffect(() => {
         if (userToken) {
             getUserAppointments()
@@ -88,7 +112,7 @@ const MyAppointments = () => {
                         <div className="flex flex-col gap-2 justify-end text-sm text-center">
                             {!item.cancelled && !item.isCompleted &&
                                 <>
-                                    <button className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Pay Online</button>
+                                    <button className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300' onClick={() => appointmentStripe(item._id)}>Pay Online</button>
                                     {!item.cancelled && !item.isCompleted &&
                                         <button className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'
                                             onClick={() => cancelAppointments(item._id)}

@@ -12,7 +12,7 @@ const MyProfile = () => {
 
     const [isEdit, setIsEdit] = useState(false)
     const [image, setImage] = useState(false)
-    const [userData, setUserData] = useState(false)
+    const [userData, setUserData] = useState(null)
     const hasFetched = useRef(false);
 
 

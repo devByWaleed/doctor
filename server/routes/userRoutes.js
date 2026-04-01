@@ -1,10 +1,11 @@
 import express from "express"
-import { getProfile, login, register, updateProfile, bookAppointment, listAppointment, cancelAppointment } from "../controllers/userController.js";
+import { getProfile, login, register, updateProfile, bookAppointment, listAppointment, cancelAppointment, paymentStripe, } from "../controllers/userController.js";
 import authUser from "../middleware/authUser.js";
 import upload from "../config/multer.js";
 
 const userRouter = express.Router();
 
+userRouter.post('/payment-stripe', authUser, paymentStripe);
 userRouter.post("/register", register)
 userRouter.post("/login", login)
 userRouter.get("/get-profile", authUser, getProfile)
